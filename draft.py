@@ -89,6 +89,11 @@ rule_a9 = ctrl.Rule(
     disposable_income['high'] & item_price['high'],
     (affordability['low'], risk['high'])
 )
+rule_a10 = ctrl.Rule(
+    disposable_income['medium'] & item_price['high'],
+    (affordability['very_low'], risk['high'])
+)
+
 
 # Risk Rules
 # Rule: High savings always lead to low risk
@@ -124,7 +129,7 @@ rule_r9 = ctrl.Rule(
 
 # Combine all rules
 rules = [
-    rule_a0, rule_a1, rule_a2, rule_a3, rule_a4, rule_a5, rule_a6, rule_a7, rule_a8, rule_a9,
+    rule_a0, rule_a1, rule_a2, rule_a3, rule_a4, rule_a5, rule_a6, rule_a7, rule_a8, rule_a9, rule_a10,
     rule_r1, rule_r2, rule_r3, rule_r4, rule_r5, rule_r6, rule_r7, rule_r8, rule_r9
 ]
 
@@ -133,10 +138,10 @@ financial_ctrl = ctrl.ControlSystem(rules)
 financial_simulation = ctrl.ControlSystemSimulation(financial_ctrl)
 
 # Provide inputs
-financial_simulation.input['disposable_income'] = -2000
-financial_simulation.input['item_price'] = 5000
-financial_simulation.input['savings'] = 80000
-financial_simulation.input['credit_score'] = 400
+financial_simulation.input['disposable_income'] = 7000
+financial_simulation.input['item_price'] = 50000
+financial_simulation.input['savings'] = 1000
+financial_simulation.input['credit_score'] = 850
 
 # Compute outputs
 try:
