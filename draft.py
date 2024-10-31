@@ -12,23 +12,23 @@ credit_score = ctrl.Antecedent(np.arange(300, 851, 1), 'credit_score')
 affordability = ctrl.Consequent(np.arange(0, 101, 1), 'affordability')
 risk = ctrl.Consequent(np.arange(0, 101, 1), 'risk')
 
-# Adjusted Membership functions for disposable_income
+# Membership functions for disposable_income
 disposable_income['very_low'] = fuzz.trapmf(disposable_income.universe, [-10000, -10000, 0, 3000])
 disposable_income['low'] = fuzz.trimf(disposable_income.universe, [0, 3000, 6000])
 disposable_income['medium'] = fuzz.trimf(disposable_income.universe, [6000, 10000, 14000])
 disposable_income['high'] = fuzz.trapmf(disposable_income.universe, [13000, 20000, 20000, 20000])
 
-# Adjusted Membership functions for item_price
+#  Membership functions for item_price
 item_price['low'] = fuzz.trimf(item_price.universe, [0, 0, 10000])
 item_price['medium'] = fuzz.trimf(item_price.universe, [10000, 15000, 20000])
 item_price['high'] = fuzz.trapmf(item_price.universe, [20000, 50000, 100000, 100000])
 
-# Adjusted Membership functions for savings
+# Membership functions for savings
 savings['low'] = fuzz.trimf(savings.universe, [0, 0, 20000])
 savings['medium'] = fuzz.trimf(savings.universe, [15000, 40000, 65000])
 savings['high'] = fuzz.trapmf(savings.universe, [60000, 80000, 100000, 100000])
 
-# Adjusted Membership functions for credit_score
+# Membership functions for credit_score
 credit_score['poor'] = fuzz.trimf(credit_score.universe, [300, 300, 580])
 credit_score['fair'] = fuzz.trimf(credit_score.universe, [550, 610, 670])
 credit_score['good'] = fuzz.trimf(credit_score.universe, [650, 700, 750])
@@ -40,18 +40,17 @@ affordability['low'] = fuzz.trimf(affordability.universe, [10, 30, 50])
 affordability['medium'] = fuzz.trimf(affordability.universe, [40, 60, 80])
 affordability['high'] = fuzz.trapmf(affordability.universe, [70, 90, 100, 100])
 
-# Adjusted Membership functions for risk
+# Membership functions for risk
 risk['low'] = fuzz.trimf(risk.universe, [0, 0, 40])
 risk['medium'] = fuzz.trimf(risk.universe, [30, 50, 70])
 risk['high'] = fuzz.trapmf(risk.universe, [60, 80, 100, 100])
 
-# Define additional rule for negative disposable income
+# Affordability Rules
 rule_a0 = ctrl.Rule(
     disposable_income['very_low'] & item_price['low'],
     (affordability['low'], risk['medium'])
 )
 
-# Affordability Rules
 rule_a1 = ctrl.Rule(
     disposable_income['very_low'] & item_price['high'],
     (affordability['very_low'], risk['high'])
@@ -88,7 +87,7 @@ rule_a9 = ctrl.Rule(
     disposable_income['high'] & item_price['high'],
     (affordability['medium'], risk['medium'])
 )
-# New rules added
+
 rule_a10 = ctrl.Rule(
     disposable_income['medium'] & item_price['high'],
     (affordability['low'], risk['high'])
@@ -118,7 +117,6 @@ rule_r9 = ctrl.Rule(
     savings['low'] & disposable_income['very_low'],
     risk['high']
 )
-# New risk rules added
 rule_r10 = ctrl.Rule(
     savings['medium'] & credit_score['excellent'],
     risk['low']
@@ -128,14 +126,30 @@ rule_r11 = ctrl.Rule(
     risk['medium']
 )
 
+catch_all_rule = ctrl.Rule(
+    ~(
+        disposable_income['very_low'] | disposable_income['low'] |
+        disposable_income['medium'] | disposable_income['high']
+    ) & ~(
+        item_price['low'] | item_price['medium'] | item_price['high']
+    ) & ~(
+        savings['low'] | savings['medium'] | savings['high']
+    ) & ~(
+        credit_score['poor'] | credit_score['fair'] |
+        credit_score['good'] | credit_score['excellent']
+    ),
+    (affordability['very_low'], risk['medium'])  
+)
+
 # Combine all rules
 rules = [
     rule_a0, rule_a1, rule_a2, rule_a3, rule_a4, rule_a5, rule_a6, rule_a7, rule_a8, rule_a9,
-    rule_a10, rule_a11, rule_a12,  # Added new affordability rules
-    rule_r1, rule_r2, rule_r3, rule_r4, rule_r5, rule_r6, rule_r7, rule_r8, rule_r9, rule_r10, rule_r11  # Added new risk rules
+    rule_a10, rule_a11, rule_a12,  
+    rule_r1, rule_r2, rule_r3, rule_r4, rule_r5, rule_r6, rule_r7, rule_r8, rule_r9, rule_r10, rule_r11,
+    catch_all_rule  
 ]
 
-# Create a single control system
+
 financial_ctrl = ctrl.ControlSystem(rules)
 financial_simulation = ctrl.ControlSystemSimulation(financial_ctrl)
 
@@ -170,16 +184,16 @@ edge_cases = [
     (18000, 3000, 80000, 800, 89.17, 35.82),
     
     # Edge Case 4: Low Income, Low Item Price
-    (2000, 1000, 5000, 600, 50.00, 70.00),  # Adjusted expected values
+    (2000, 1000, 5000, 600, 50.00, 70.00),  
     
     # Edge Case 5: Medium Income, Medium Item Price, Low Savings
-    (8000, 15000, 2000, 680, 60.00, 80.00),  # Adjusted expected values
+    (8000, 15000, 2000, 680, 60.00, 80.00), 
     
     # Edge Case 6: High Savings, Low Income, High Item Price
     (1000, 40000, 80000, 720, 1.75, 51.32),
     
     # Edge Case 7: Max Credit Score, Low Savings, Expensive Item
-    (7000, 50000, 1000, 850, 20.00, 60.00)  # Adjusted expected values
+    (7000, 50000, 1000, 850, 20.00, 60.00) 
 ]
 
 # Run all edge cases
