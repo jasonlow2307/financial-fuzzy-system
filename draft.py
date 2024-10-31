@@ -16,7 +16,7 @@ risk = ctrl.Consequent(np.arange(0, 101, 1), 'risk')
 disposable_income['very_low'] = fuzz.trapmf(disposable_income.universe, [-10000, -10000, 0, 3000])
 disposable_income['low'] = fuzz.trimf(disposable_income.universe, [0, 3000, 6000])
 disposable_income['medium'] = fuzz.trimf(disposable_income.universe, [6000, 10000, 14000])
-disposable_income['high'] = fuzz.trapmf(disposable_income.universe, [13000, 20000, 20000, 20000])
+disposable_income['high'] = fuzz.trimf(disposable_income.universe, [13000, 20000, 20000])
 
 #  Membership functions for item_price
 item_price['low'] = fuzz.trimf(item_price.universe, [0, 0, 10000])
@@ -50,7 +50,6 @@ rule_a0 = ctrl.Rule(
     disposable_income['very_low'] & item_price['low'],
     (affordability['low'], risk['medium'])
 )
-
 rule_a1 = ctrl.Rule(
     disposable_income['very_low'] & item_price['high'],
     (affordability['very_low'], risk['high'])
@@ -87,7 +86,6 @@ rule_a9 = ctrl.Rule(
     disposable_income['high'] & item_price['high'],
     (affordability['medium'], risk['medium'])
 )
-
 rule_a10 = ctrl.Rule(
     disposable_income['medium'] & item_price['high'],
     (affordability['low'], risk['high'])
