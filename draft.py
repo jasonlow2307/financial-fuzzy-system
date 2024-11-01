@@ -21,7 +21,7 @@ disposable_income['high'] = fuzz.trimf(disposable_income.universe, [13000, 20000
 #  Membership functions for item_price
 item_price['low'] = fuzz.trimf(item_price.universe, [0, 0, 10000])
 item_price['medium'] = fuzz.trimf(item_price.universe, [10000, 15000, 20000])
-item_price['high'] = fuzz.trapmf(item_price.universe, [20000, 50000, 100000, 100000])
+item_price['high'] = fuzz.trapmf(item_price.universe, [20000, 40000, 60000, 100000])
 
 # Membership functions for savings
 savings['low'] = fuzz.trimf(savings.universe, [0, 0, 20000])
@@ -45,68 +45,83 @@ risk['low'] = fuzz.trimf(risk.universe, [0, 0, 40])
 risk['medium'] = fuzz.trimf(risk.universe, [30, 50, 70])
 risk['high'] = fuzz.trapmf(risk.universe, [60, 80, 100, 100])
 
+risk.defuzzify_method = 'mom'
+
 # Affordability Rules
 rule_a0 = ctrl.Rule(
     disposable_income['very_low'] & item_price['low'],
-    (affordability['low'], risk['medium'])
+    (affordability['low'])
 )
 rule_a1 = ctrl.Rule(
     disposable_income['very_low'] & item_price['high'],
-    (affordability['very_low'], risk['high'])
+    (affordability['very_low'])
 )
 rule_a2 = ctrl.Rule(
     disposable_income['low'] & item_price['high'],
-    (affordability['low'], risk['high'])
+    (affordability['low'])
 )
 rule_a3 = ctrl.Rule(
     disposable_income['very_low'] & item_price['medium'],
-    (affordability['low'], risk['high'])
+    (affordability['low'])
 )
 rule_a4 = ctrl.Rule(
     disposable_income['low'] & item_price['medium'],
-    (affordability['medium'], risk['medium'])
+    (affordability['medium'])
 )
 rule_a5 = ctrl.Rule(
     disposable_income['medium'] & item_price['medium'],
-    (affordability['medium'], risk['medium'])
+    (affordability['medium'])
 )
 rule_a6 = ctrl.Rule(
     disposable_income['medium'] & item_price['low'],
-    (affordability['high'], risk['low'])
+    (affordability['high'])
 )
 rule_a7 = ctrl.Rule(
     disposable_income['high'] & item_price['low'],
-    (affordability['high'], risk['low'])
+    (affordability['high'])
 )
 rule_a8 = ctrl.Rule(
     disposable_income['high'] & item_price['medium'],
-    (affordability['high'], risk['medium'])
+    (affordability['high'])
 )
 rule_a9 = ctrl.Rule(
     disposable_income['high'] & item_price['high'],
-    (affordability['medium'], risk['medium'])
+    affordability['low']
 )
 rule_a10 = ctrl.Rule(
     disposable_income['medium'] & item_price['high'],
-    (affordability['low'], risk['high'])
+    (affordability['low'])
 )
 rule_a11 = ctrl.Rule(
     disposable_income['low'] & item_price['low'],
-    (affordability['medium'], risk['medium'])
+    (affordability['medium'])
 )
 rule_a12 = ctrl.Rule(
     disposable_income['medium'] & item_price['medium'],
-    (affordability['medium'], risk['medium'])
+    (affordability['medium'])
+)
+rule_a13 = ctrl.Rule(
+    disposable_income['very_low'] & item_price['high'],
+    affordability['very_low']
+)
+rule_a14 = ctrl.Rule(
+    disposable_income['medium'] & item_price['high'],
+    affordability['low']
+)
+rule_a15 = ctrl.Rule(
+    disposable_income['high'] & item_price['high'],
+    affordability['very_low']
 )
 
+
 # Risk Rules
-rule_r1 = ctrl.Rule(savings['high'], risk['low'])
+rule_r1 = ctrl.Rule(savings['high'] & ~disposable_income['very_low'], risk['low'])
 rule_r2 = ctrl.Rule(savings['medium'] & (credit_score['good'] | credit_score['excellent']), risk['low'])
-rule_r3 = ctrl.Rule(savings['low'], risk['high'])
+rule_r3 = ctrl.Rule(savings['low'] & (credit_score['poor'] | credit_score['fair']), risk['high'])
 rule_r4 = ctrl.Rule(savings['medium'] & (credit_score['poor'] | credit_score['fair']), risk['high'])
 rule_r5 = ctrl.Rule(savings['low'] & credit_score['excellent'], risk['medium'])
 rule_r6 = ctrl.Rule(savings['medium'] & item_price['high'], risk['high'])
-rule_r7 = ctrl.Rule(savings['high'] & item_price['high'], risk['medium'])
+rule_r7 = ctrl.Rule(savings['high'] & item_price['high'], risk['high'])
 rule_r8 = ctrl.Rule(
     disposable_income['very_low'] & credit_score['poor'],
     risk['high']
@@ -123,6 +138,17 @@ rule_r11 = ctrl.Rule(
     credit_score['excellent'],
     risk['medium']
 )
+rule_r12 = ctrl.Rule(savings['low'] & credit_score['good'], risk['medium'])
+rule_r13 = ctrl.Rule(disposable_income['very_low'], risk['high'])
+rule_r14 = ctrl.Rule(
+    savings['low'] & (credit_score['good'] | credit_score['excellent']),
+    risk['high']
+)
+rule_r15 = ctrl.Rule(
+    item_price['high'] & savings['medium'],
+    risk['high']
+)
+
 
 catch_all_rule = ctrl.Rule(
     ~(
@@ -136,14 +162,14 @@ catch_all_rule = ctrl.Rule(
         credit_score['poor'] | credit_score['fair'] |
         credit_score['good'] | credit_score['excellent']
     ),
-    (affordability['very_low'], risk['medium'])  
+    (affordability['very_low'], risk['medium'])
 )
 
 # Combine all rules
 rules = [
     rule_a0, rule_a1, rule_a2, rule_a3, rule_a4, rule_a5, rule_a6, rule_a7, rule_a8, rule_a9,
-    rule_a10, rule_a11, rule_a12,  
-    rule_r1, rule_r2, rule_r3, rule_r4, rule_r5, rule_r6, rule_r7, rule_r8, rule_r9, rule_r10, rule_r11,
+    rule_a10, rule_a11, rule_a12, rule_a13,   
+    rule_r1, rule_r2, rule_r3, rule_r4, rule_r5, rule_r6, rule_r7, rule_r8, rule_r9, rule_r10, rule_r11, rule_r12, rule_r13,
     catch_all_rule  
 ]
 
