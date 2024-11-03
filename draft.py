@@ -13,7 +13,8 @@ affordability = ctrl.Consequent(np.arange(0, 101, 1), 'affordability')
 risk = ctrl.Consequent(np.arange(0, 101, 1), 'risk')
 
 # Membership functions for disposable_income
-disposable_income['very_low'] = fuzz.trapmf(disposable_income.universe, [-10000, -10000, 0, 3000])
+disposable_income['negative'] = fuzz.trapmf(disposable_income.universe, [-10000, -10000, -1, 0])
+disposable_income['very_low'] = fuzz.trimf(disposable_income.universe, [0, 3000, 3000])
 disposable_income['low'] = fuzz.trimf(disposable_income.universe, [0, 3000, 6000])
 disposable_income['medium'] = fuzz.trimf(disposable_income.universe, [6000, 10000, 14000])
 disposable_income['high'] = fuzz.trimf(disposable_income.universe, [13000, 20000, 20000])
@@ -45,6 +46,10 @@ risk['low'] = fuzz.trimf(risk.universe, [0, 0, 40])
 risk['medium'] = fuzz.trimf(risk.universe, [30, 50, 70])
 risk['high'] = fuzz.trapmf(risk.universe, [70, 85, 100, 100])
 
+# Set the defuzzification method for the risk output to 'mom' (Mean of Maximum),
+# which calculates the average of the maximum values in the fuzzy output set.
+# This method provides a balanced risk value when multiple outputs have high degrees of membership,
+# avoiding extreme values that could result from single-point defuzzification methods.
 risk.defuzzify_method = 'mom'
 
 # Affordability Rules
@@ -112,7 +117,10 @@ rule_a15 = ctrl.Rule(
     disposable_income['high'] & item_price['high'],
     affordability['very_low']
 )
-
+rule_a16 = ctrl.Rule(
+    disposable_income['negative'],
+    affordability['very_low']
+)
 
 # Risk Rules
 rule_r1 = ctrl.Rule(savings['high'] & ~disposable_income['very_low'], risk['low'])
@@ -162,13 +170,18 @@ rule_r17 = ctrl.Rule(
     disposable_income['very_low'] & savings['high'] & credit_score['excellent'],
     risk['medium']
 )
-# New rule to lower risk when disposable income is very low but savings are high and credit score is excellent
 rule_r18 = ctrl.Rule(
     disposable_income['very_low'] & savings['high'] & credit_score['excellent'],
     risk['medium']
 )
-
-
+rule_r19 = ctrl.Rule(
+    disposable_income['negative'] & savings['high'],
+    risk['high']
+)
+rule_r20 = ctrl.Rule(
+    disposable_income['negative'] & savings['high'] & item_price['low'],
+    risk['medium']
+)
 
 catch_all_rule = ctrl.Rule(
     ~(
@@ -188,9 +201,9 @@ catch_all_rule = ctrl.Rule(
 # Combine all rules
 rules = [
     rule_a0, rule_a1, rule_a2, rule_a3, rule_a4, rule_a5, rule_a6, rule_a7, rule_a8, rule_a9,
-    rule_a10, rule_a11, rule_a12, rule_a13, rule_a14, rule_a15,
+    rule_a10, rule_a11, rule_a12, rule_a13, rule_a14, rule_a15, rule_a16,
     rule_r1, rule_r2, rule_r3, rule_r4, rule_r5, rule_r6, rule_r7, rule_r8, rule_r9, rule_r10,
-    rule_r11, rule_r12, rule_r13, rule_r14, rule_r15, rule_r16, rule_r17, rule_r18,
+    rule_r11, rule_r12, rule_r13, rule_r14, rule_r15, rule_r16, rule_r17, rule_r18, rule_r19, rule_r20,
     catch_all_rule  
 ]
 
@@ -220,22 +233,22 @@ def test_edge_case(disposable_income_input, item_price_input, savings_input, cre
 # List of edge cases to test
 edge_cases = [
     # Edge Case 1: Negative Disposable Income
-    (-2000, 5000, 80000, 400, 0.0, 100.0),
+    (-2000, 5000, 80000, 400, 0.0, 90.0),
     
     # Edge Case 2: High Disposable Income with Expensive Item
-    (15000, 90000, 50000, 750, 15.00, 70.45),
+    (15000, 90000, 50000, 750, 30.00, 50),
     
     # Edge Case 3: High Income, Low Item Price
     (18000, 3000, 80000, 800, 89.17, 35.82),
     
     # Edge Case 4: Low Income, Low Item Price
-    (2000, 1000, 5000, 600, 50.00, 70.00),  
+    (2000, 1000, 5000, 600, 50.00, 90.00),  
     
     # Edge Case 5: Medium Income, Medium Item Price, Low Savings
-    (8000, 15000, 2000, 680, 60.00, 80.00), 
+    (8000, 15000, 2000, 680, 60.00, 70.00), 
     
     # Edge Case 6: High Savings, Low Income, High Item Price
-    (1000, 40000, 80000, 720, 1.75, 51.32),
+    (1000, 40000, 80000, 720, 20, 51.32),
     
     # Edge Case 7: Max Credit Score, Low Savings, Expensive Item
     (7000, 50000, 1000, 850, 20.00, 60.00) 
