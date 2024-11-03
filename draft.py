@@ -36,7 +36,7 @@ credit_score['good'] = fuzz.trimf(credit_score.universe, [670, 710, 750])
 credit_score['excellent'] = fuzz.trapmf(credit_score.universe, [740, 770, 850, 850])
 
 # Membership functions for affordability
-affordability['very_low'] = fuzz.trimf(affordability.universe, [0, 0, 2])
+affordability['very_low'] = fuzz.trimf(affordability.universe, [0, 0, 10])
 affordability['low'] = fuzz.trimf(affordability.universe, [10, 30, 50])
 affordability['medium'] = fuzz.trimf(affordability.universe, [40, 60, 80])
 affordability['high'] = fuzz.trapmf(affordability.universe, [70, 90, 100, 100])
