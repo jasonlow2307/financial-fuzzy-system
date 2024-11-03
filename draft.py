@@ -9,7 +9,7 @@ savings = ctrl.Antecedent(np.arange(0, 100001, 1), 'savings')
 credit_score = ctrl.Antecedent(np.arange(300, 851, 1), 'credit_score')
 
 # Define Consequents (Outputs)
-affordability = ctrl.Consequent(np.arange(0, 101, 1), 'affordability')
+affordability = ctrl.Consequent(np.arange(-10, 101, 1), 'affordability')
 risk = ctrl.Consequent(np.arange(0, 101, 1), 'risk')
 
 # Membership functions for disposable_income
@@ -36,7 +36,7 @@ credit_score['good'] = fuzz.trimf(credit_score.universe, [670, 710, 750])
 credit_score['excellent'] = fuzz.trapmf(credit_score.universe, [740, 770, 850, 850])
 
 # Membership functions for affordability
-affordability['very_low'] = fuzz.trimf(affordability.universe, [0, 0, 10])
+affordability['very_low'] = fuzz.trimf(affordability.universe, [-10, -10, 10])
 affordability['low'] = fuzz.trimf(affordability.universe, [10, 30, 50])
 affordability['medium'] = fuzz.trimf(affordability.universe, [40, 60, 80])
 affordability['high'] = fuzz.trapmf(affordability.universe, [70, 90, 100, 100])
@@ -236,7 +236,7 @@ edge_cases = [
     (-2000, 5000, 80000, 400, 0.0, 90.0),
     
     # Edge Case 2: High Disposable Income with Expensive Item
-    (15000, 90000, 50000, 750, 30.00, 50),
+    (15000, 90000, 50000, 750, 20.00, 50),
     
     # Edge Case 3: High Income, Low Item Price
     (18000, 3000, 80000, 800, 89.17, 35.82),
@@ -251,7 +251,7 @@ edge_cases = [
     (1000, 40000, 80000, 720, 20, 51.32),
     
     # Edge Case 7: Max Credit Score, Low Savings, Expensive Item
-    (7000, 50000, 1000, 850, 20.00, 60.00) 
+    (7000, 50000, 1000, 850, 30.00, 60.00) 
 ]
 
 # Run all edge cases
