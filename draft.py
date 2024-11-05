@@ -262,8 +262,22 @@ for case in edge_cases:
     run_simulation(*case)
 '''
 
+def display_welcome_message():
+    welcome_art = """
+    ====================================================
+                   💵💲 WELCOME TO THE 💲💵
+                   
+               FINANCIAL AFFORDABILITY AND
+                    RISK ASSESSMENT TOOL
+                  
+                   💲💲💲💲💲💲💲💲💲💲💲💲💲
+    ====================================================
+    """
+    print(welcome_art)
+
 # Function to get user input and run the simulation
 def get_user_input_and_run_simulation():
+    display_welcome_message()
     disposable_income_input = float(input("Enter Disposable Income: "))
     item_price_input = float(input("Enter Item Price: "))
     savings_input = float(input("Enter Savings: "))
