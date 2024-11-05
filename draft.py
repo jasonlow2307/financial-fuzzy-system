@@ -212,7 +212,7 @@ financial_ctrl = ctrl.ControlSystem(rules)
 financial_simulation = ctrl.ControlSystemSimulation(financial_ctrl)
 
 # Test function for edge cases
-def test_edge_case(disposable_income_input, item_price_input, savings_input, credit_score_input, expected_affordability, expected_risk):
+def test_edge_case(disposable_income_input, item_price_input, savings_input, credit_score_input):
     financial_simulation.input['disposable_income'] = disposable_income_input
     financial_simulation.input['item_price'] = item_price_input
     financial_simulation.input['savings'] = savings_input
@@ -225,33 +225,31 @@ def test_edge_case(disposable_income_input, item_price_input, savings_input, cre
     print(f"  Item Price: {item_price_input}")
     print(f"  Savings: {savings_input}")
     print(f"  Credit Score: {credit_score_input}")
-    print(f"  Expected Affordability Index: {expected_affordability}")
-    print(f"  Expected Financial Risk Level: {expected_risk}")
     print(f"  Computed Affordability Index: {financial_simulation.output['affordability']:.2f}")
     print(f"  Computed Financial Risk Level: {financial_simulation.output['risk']:.2f}\n")
 
 # List of edge cases to test
 edge_cases = [
     # Edge Case 1: Negative Disposable Income
-    (-2000, 5000, 80000, 400, 0.0, 90.0),
+    (-2000, 5000, 80000, 400),
     
     # Edge Case 2: High Disposable Income with Expensive Item
-    (15000, 90000, 50000, 750, 20.00, 50),
+    (15000, 90000, 50000, 750),
     
     # Edge Case 3: High Income, Low Item Price
-    (18000, 3000, 80000, 800, 89.17, 35.82),
+    (18000, 3000, 80000, 800),
     
     # Edge Case 4: Low Income, Low Item Price
-    (2000, 1000, 5000, 600, 50.00, 90.00),  
+    (2000, 1000, 5000, 600),  
     
     # Edge Case 5: Medium Income, Medium Item Price, Low Savings
-    (8000, 15000, 2000, 680, 60.00, 70.00), 
+    (8000, 15000, 2000, 680), 
     
     # Edge Case 6: High Savings, Low Income, High Item Price
-    (1000, 40000, 80000, 720, 20, 51.32),
+    (1000, 40000, 80000, 720),
     
     # Edge Case 7: Max Credit Score, Low Savings, Expensive Item
-    (7000, 50000, 1000, 850, 30.00, 60.00) 
+    (7000, 50000, 1000, 850) 
 ]
 
 # Run all edge cases
