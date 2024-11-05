@@ -211,8 +211,9 @@ rules = [
 financial_ctrl = ctrl.ControlSystem(rules)
 financial_simulation = ctrl.ControlSystemSimulation(financial_ctrl)
 
+
 # Test function for edge cases
-def test_edge_case(disposable_income_input, item_price_input, savings_input, credit_score_input):
+def run_simulation(disposable_income_input, item_price_input, savings_input, credit_score_input):
     financial_simulation.input['disposable_income'] = disposable_income_input
     financial_simulation.input['item_price'] = item_price_input
     financial_simulation.input['savings'] = savings_input
@@ -220,14 +221,18 @@ def test_edge_case(disposable_income_input, item_price_input, savings_input, cre
 
     financial_simulation.compute()
     
-    print(f"Test Case: ")
-    print(f"  Disposable Income: {disposable_income_input}")
-    print(f"  Item Price: {item_price_input}")
-    print(f"  Savings: {savings_input}")
-    print(f"  Credit Score: {credit_score_input}")
-    print(f"  Computed Affordability Index: {financial_simulation.output['affordability']:.2f}")
-    print(f"  Computed Financial Risk Level: {financial_simulation.output['risk']:.2f}\n")
+    print("\n====================== Test Case ======================")
+    print(f"  Inputs:")
+    print(f"    Disposable Income   : $ {disposable_income_input:,.2f}")
+    print(f"    Item Price          : $ {item_price_input:,.2f}")
+    print(f"    Savings             : $ {savings_input:,.2f}")
+    print(f"    Credit Score        :   {credit_score_input}")
+    print("\n======================= Results =======================")
+    print(f"  Computed Affordability Index : {financial_simulation.output['affordability']:.2f}")
+    print(f"  Computed Financial Risk Level: {financial_simulation.output['risk']:.2f}")
+    print("=======================================================\n")
 
+'''
 # List of edge cases to test
 edge_cases = [
     # Edge Case 1: Negative Disposable Income
@@ -254,4 +259,17 @@ edge_cases = [
 
 # Run all edge cases
 for case in edge_cases:
-    test_edge_case(*case)
+    run_simulation(*case)
+'''
+
+# Function to get user input and run the simulation
+def get_user_input_and_run_simulation():
+    disposable_income_input = float(input("Enter Disposable Income: "))
+    item_price_input = float(input("Enter Item Price: "))
+    savings_input = float(input("Enter Savings: "))
+    credit_score_input = float(input("Enter Credit Score: "))
+
+    run_simulation(disposable_income_input, item_price_input, savings_input, credit_score_input)
+
+
+get_user_input_and_run_simulation()
